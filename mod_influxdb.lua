@@ -1,7 +1,8 @@
 -- Log common stats to influxdb
 --
--- Authors: Marcus Stong,
---          Daurnimator
+-- Authors: Marcus Stong
+--
+-- Contributors: Daurnimator
 --
 -- This module is MIT/X11 licensed.
 
