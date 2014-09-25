@@ -109,5 +109,5 @@ module:hook("muc-decline", function(event)
     send(cjson.encode(message))
 end)
 
-log("info", "Loaded influxdb module")
+module:log("info", "Loaded influxdb module")
 
