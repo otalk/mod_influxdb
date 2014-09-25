@@ -108,3 +108,6 @@ module:hook("muc-decline", function(event)
     table.insert(message, prepare_point(event_declined_name, 1))
     send(cjson.encode(message))
 end)
+
+log("info", "Loaded influxdb module")
+
