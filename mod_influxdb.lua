@@ -1,6 +1,7 @@
 -- Log common stats to influxdb
 --
--- Credit to Daurnimator and mod_statsd for code and inspiration
+-- Authors: Marcus Stong,
+--          Daurnimator
 --
 -- This module is MIT/X11 licensed.
 
