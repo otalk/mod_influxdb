@@ -1,5 +1,7 @@
 -- Log common stats to influxdb
 --
+-- Credit to Daurnimator and mod_statsd for code and inspiration
+--
 -- This module is MIT/X11 licensed.
 
 local socket = require "socket"
