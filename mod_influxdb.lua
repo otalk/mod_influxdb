@@ -1,13 +1,14 @@
--- Log common stats to statsd
+-- Log common stats to influxdb
 --
 -- This module is MIT/X11 licensed.
 
 local socket = require "socket"
 local iterators = require "util.iterators"
 local jid = require "util.jid"
+local cjson = require "cjson"
 local options = module:get_option("influxdb") or {}
 
--- Create UDP socket to statsd server
+-- Create UDP socket to influxdb api
 local sock = socket.udp()
 sock:setpeername(options.hostname or "127.0.0.1", options.port or 4444)
 
@@ -21,7 +22,7 @@ function clean(s) return (s:gsub("[%.:\n]", "_")) end
 function prepare_point(name, point)
   local point = {
     name = prefix..name,
-    columns = { 'value', 'host' },
+    columns = { "value", "host" },
     points = {
       { point, module.host }
     }
@@ -61,7 +62,8 @@ module:hook("muc-occupant-left", function(event)
     local message = {}
     table.insert(message, prepare_point("n_occupants", -1))
     local room_node = jid.split(event.room.jid)
-    table.insert(message, clean(room_node)..".occupants", -1))
+    local occupants_name = clean(room_node)..".occupants"
+    table.insert(message, prepare_point(occupants_name, -1))
     send(cjson.encode(message))
 end)
 
@@ -70,7 +72,8 @@ module:hook("muc-broadcast-message", function(event)
     local message = {}
     table.insert(message, prepare_point("broadcast-message", 1))
     local room_node = jid.split(event.room.jid)
-    table.insert(message, clean(room_node)..".broadcast-message", 1))
+    local broadcast_message_name = clean(room_node)..".broadcast-message"
+    table.insert(message, prepare_point(broadcast_message_name, 1))
     send(cjson.encode(message))
 end)
 
@@ -80,9 +83,11 @@ module:hook("muc-invite", function(event)
     table.insert(message, prepare_point("invite", 1))
     local room_node = jid.split(event.room.jid)
     -- Counts per room
-    table.insert(message, clean(room_node)..".invite", 1))
+    local invite_name = clean(room_node)..".invite"
+    table.insert(message, prepare_point(invite_name, 1))
     -- Counts per recipient
-    table.insert(message, clean(event.stanza.attr.to)..".invited", 1))
+    local stanza_invite_name = clean(event.stanza.attr.to)..".invited"
+    table.insert(message, prepare_point(stanza_invite_name, 1))
     send(cjson.encode(message))
 end)
 
@@ -92,8 +97,10 @@ module:hook("muc-decline", function(event)
     table.insert(message, prepare_point("decline", 1))
     local room_node = jid.split(event.room.jid)
     -- Counts per room
-    table.insert(message, clean(room_node)..".decline", 1))
+    local room_decline_name = clean(room_node)..".decline"
+    table.insert(message, prepare_point(room_decline_name, 1))
     -- Counts per sender
-    table.insert(message, clean(event.incoming.attr.from)..".declined", 1))
+    local event_declined_name = clean(event.incoming.attr.from)..".declined"
+    table.insert(message, prepare_point(event_declined_name, 1))
     send(cjson.encode(message))
 end)
