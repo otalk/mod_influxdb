@@ -23,15 +23,16 @@ local prefix = (options.prefix or "prosody") .. "."
 function clean(s) return (s:gsub("[%.:\n]", "_")) end
 
 -- Standard point formatting
-function prepare_point(name, point)
-  local point = {
+function prepare_point(name, point, host)
+  local hostname = host or module.host
+  local point_serialized = {
     name = prefix..name,
     columns = { "value", "host" },
     points = {
-      { point, module.host }
+      { point, hostname }
     }
   }
-  return point
+  return point_serialized
 end
 
 -- A 'safer' send function to expose
@@ -106,6 +107,20 @@ module:hook("muc-decline", function(event)
     -- Counts per sender
     local event_declined_name = clean(event.incoming.attr.from)..".declined"
     table.insert(message, prepare_point(event_declined_name, 1))
+    send(cjson.encode(message))
+end)
+
+module:hook("colibri-stats", function(event)
+    local message = {}
+    -- we'll set this as host in these metrics
+    local host = event.bridge
+    -- iterate over each stat
+    for k,v in ipairs(event.stats) do
+        local name = "jvb."..v.attr.name
+        local value = v.attr.value
+        table.insert(message, prepare_point(name, value, host))
+    end
+    --module:log("debug", "point %s: ", serialization.serialize(message))
     send(cjson.encode(message))
 end)
 
