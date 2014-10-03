@@ -117,7 +117,7 @@ module:hook("colibri-stats", function(event)
     -- iterate over each stat
     for k,v in ipairs(event.stats) do
         local name = "jvb."..v.attr.name
-        local value = v.attr.value
+        local value = tonumber(v.attr.value)
         table.insert(message, prepare_point(name, value, host))
     end
     --module:log("debug", "point %s: ", serialization.serialize(message))
