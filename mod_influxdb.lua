@@ -29,7 +29,7 @@ end
 -- Standard point formatting
 function prepare_point(name, point, host)
   local hostname = host or module.host
-  table.insert(point.points, host)
+  table.insert(point.points, hostname)
   if point.columns then
     table.insert(point.columns, "host")
   end
