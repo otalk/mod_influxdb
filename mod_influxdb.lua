@@ -129,9 +129,9 @@ module:hook("colibri-stats", function(event)
     -- we'll set this as host in these metrics
     local host = event.bridge
     -- iterate over each stat
-    for k,v in ipairs(event.stats) do
-        local name = "jvb."..v.attr.name
-        local value = tonumber(v.attr.value)
+    for k,v in pairs(event.stats) do
+        local name = "jvb."..k
+        local value = tonumber(v)
         table.insert(message, prepare_point(name, { points = { value } }, host))
     end
     send(cjson.encode(message))
