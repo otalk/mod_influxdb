@@ -117,10 +117,11 @@ end)
 module:hook("eventlog-stat", function(event)
     local message = {}
     -- iterate over each stat
+    local from = event.from
     local service = event.service
     local name = event.metric
     local value = tonumber(event.value)
-    table.insert(message, prepare_point("client", { columns = { "metric", "value" }, points = { name, value } }, service))
+    table.insert(message, prepare_point("client", { columns = { "metric", "from", "value" }, points = { name, from, value } }, service))
     --module:log("info", "client series %s: ", serialization.serialize(message))
     send(cjson.encode(message))
 end)
