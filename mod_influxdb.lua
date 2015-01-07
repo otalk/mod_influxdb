@@ -106,8 +106,10 @@ module:hook("colibri-stats", function(event)
     -- iterate over each stat
     for k,v in pairs(event.stats) do
         local value = tonumber(v)
-        table.insert(data.columns, k)
-        table.insert(data.points, value)
+        if value then -- only numeric stats
+            table.insert(data.columns, k)
+            table.insert(data.points, value)
+        end
     end
     table.insert(message, prepare_point(name, { columns = data.columns, points = data.points }, host))
     --module:log("info", "colibri series %s: ", serialization.serialize(message))
